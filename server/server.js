@@ -20,7 +20,7 @@ const app = express();
 
 // Use cors middleware and specify the origin
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://graphql-book-search-engine.onrender.com/'], 
+  origin: ['http://localhost:3000', 'https://graphql-book-search-engine-18td.onrender.com/'], 
   credentials: true,
 }));
 
