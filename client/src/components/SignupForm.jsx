@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 
-import { createUser } from '../utils/API';
 import Auth from '../utils/auth';
+
+import { useMutation } from '@apollo/client';
+import { ADD_USER } from '../utils/mutations';
+
 
 const SignupForm = () => {
   // set initial form state
@@ -11,6 +14,8 @@ const SignupForm = () => {
   const [validated] = useState(false);
   // set state for alert
   const [showAlert, setShowAlert] = useState(false);
+
+  const [addUser] = useMutation(ADD_USER);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -27,16 +32,25 @@ const SignupForm = () => {
       event.stopPropagation();
     }
 
+    // Check if userFormData contains username, email, and password
+    if (!userFormData.username || !userFormData.email || !userFormData.password) {
+      console.error('Username, email, and password are required');
+      setShowAlert(true);
+      return;
+    }
+
     try {
-      const response = await createUser(userFormData);
+      const response = await addUser({
+        variables: {
+          username: userFormData.username.toString(),
+          email: userFormData.email.toString(),
+          password: userFormData.password.toString(),
+        },
+      });
 
-      if (!response.ok) {
-        throw new Error('something went wrong!');
-      }
+      console.log(response);
 
-      const { token, user } = await response.json();
-      console.log(user);
-      Auth.login(token);
+      Auth.login(response.data.addUser.token);
     } catch (err) {
       console.error(err);
       setShowAlert(true);
